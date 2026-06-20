@@ -14,7 +14,34 @@ import {
   Rocket,
   Sparkles,
 } from 'lucide-react';
+import { motion, type Variants } from 'motion/react';
 import { resumeData } from './resumeData';
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28, filter: 'blur(8px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.62, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const stagger: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.08,
+    },
+  },
+};
+
+const cardMotion = {
+  whileHover: { y: -5, scale: 1.01 },
+  whileTap: { scale: 0.985 },
+  transition: { type: 'spring', stiffness: 360, damping: 26 },
+};
 
 const contactItems = [
   { label: 'Phone', value: resumeData.contact.phone, href: `tel:${resumeData.contact.phone}`, icon: Phone },
@@ -49,30 +76,40 @@ function SectionHeading({
 function Hero() {
   return (
     <header className="hero">
-      <div className="hero-copy">
-        <div className="status-pill">
+      <motion.div className="hero-copy" variants={stagger} initial="hidden" animate="visible">
+        <motion.div className="status-pill" variants={fadeUp}>
           <span />
           Available for senior frontend opportunities
-        </div>
-        <h1>{resumeData.name}</h1>
-        <p className="hero-title">{resumeData.title}</p>
-        <p className="hero-summary">{resumeData.summary}</p>
-        <div className="hero-actions" aria-label="Primary contact links">
-          <a className="primary-action" href={`mailto:${resumeData.contact.email}`}>
+        </motion.div>
+        <motion.h1 variants={fadeUp}>{resumeData.name}</motion.h1>
+        <motion.p className="hero-title" variants={fadeUp}>
+          {resumeData.title}
+        </motion.p>
+        <motion.p className="hero-summary" variants={fadeUp}>
+          {resumeData.summary}
+        </motion.p>
+        <motion.div className="hero-actions" aria-label="Primary contact links" variants={fadeUp}>
+          <motion.a className="primary-action" href={`mailto:${resumeData.contact.email}`} {...cardMotion}>
             <Mail size={18} />
             Contact Me
-          </a>
-          <a className="ghost-action" href={resumeData.contact.linkedin} target="_blank" rel="noreferrer">
+          </motion.a>
+          <motion.a className="ghost-action" href={resumeData.contact.linkedin} target="_blank" rel="noreferrer" {...cardMotion}>
             <Linkedin size={18} />
             LinkedIn
-          </a>
-          <a className="ghost-action" href={resumeData.contact.github} target="_blank" rel="noreferrer">
+          </motion.a>
+          <motion.a className="ghost-action" href={resumeData.contact.github} target="_blank" rel="noreferrer" {...cardMotion}>
             <Github size={18} />
             GitHub
-          </a>
-        </div>
-      </div>
-      <div className="hero-visual" aria-hidden="true">
+          </motion.a>
+        </motion.div>
+      </motion.div>
+      <motion.div
+        className="hero-visual"
+        aria-hidden="true"
+        initial={{ opacity: 0, scale: 0.92, rotate: -2 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
+      >
         <span className="signal-dot dot-one" />
         <span className="signal-dot dot-two" />
         <span className="signal-dot dot-three" />
@@ -84,14 +121,21 @@ function Hero() {
           <strong>React</strong>
           <span>TypeScript / Micro Frontends / PWA</span>
         </div>
-      </div>
+      </motion.div>
     </header>
   );
 }
 
 function ContactPanel() {
   return (
-    <section className="panel contact-panel" aria-labelledby="contact-heading">
+    <motion.section
+      className="panel contact-panel"
+      aria-labelledby="contact-heading"
+      variants={fadeUp}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.24 }}
+    >
       <SectionHeading title="Contact" icon={Phone} />
       <div className="contact-list" id="contact-heading">
         {contactItems.map(({ label, value, href, icon: Icon }) => {
@@ -108,23 +152,23 @@ function ContactPanel() {
           );
 
           return href ? (
-            <a key={label} className="contact-item" href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+            <motion.a key={label} className="contact-item" href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer" {...cardMotion}>
               {content}
-            </a>
+            </motion.a>
           ) : (
-            <div key={label} className="contact-item">
+            <motion.div key={label} className="contact-item" {...cardMotion}>
               {content}
-            </div>
+            </motion.div>
           );
         })}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function SkillsPanel() {
   return (
-    <section className="panel" aria-labelledby="skills-heading">
+    <motion.section className="panel" aria-labelledby="skills-heading" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.18 }}>
       <SectionHeading title="Skills" icon={Sparkles} />
       <div className="skills-stack" id="skills-heading">
         {resumeData.skills.map((group) => (
@@ -132,19 +176,21 @@ function SkillsPanel() {
             <h3>{group.title}</h3>
             <div className="skill-cloud">
               {group.items.map((item) => (
-                <span key={item}>{item}</span>
+                <motion.span key={item} whileHover={{ y: -2, scale: 1.04 }} transition={{ type: 'spring', stiffness: 420, damping: 24 }}>
+                  {item}
+                </motion.span>
               ))}
             </div>
           </div>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function EducationPanel() {
   return (
-    <section className="panel compact-panel" aria-labelledby="education-heading">
+    <motion.section className="panel compact-panel" aria-labelledby="education-heading" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
       <SectionHeading title="Education" icon={GraduationCap} />
       <div className="stacked-list" id="education-heading">
         {resumeData.education.map((item) => (
@@ -155,32 +201,34 @@ function EducationPanel() {
           </article>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function LanguagesPanel() {
   return (
-    <section className="panel compact-panel" aria-labelledby="languages-heading">
+    <motion.section className="panel compact-panel" aria-labelledby="languages-heading" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
       <SectionHeading title="Languages" icon={Languages} />
       <div className="language-list" id="languages-heading">
         {resumeData.languages.map((language) => (
-          <span key={language}>{language}</span>
+          <motion.span key={language} whileHover={{ y: -2, scale: 1.04 }} transition={{ type: 'spring', stiffness: 420, damping: 24 }}>
+            {language}
+          </motion.span>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function ExperienceTimeline() {
   return (
-    <section className="content-section" id="experience">
+    <motion.section className="content-section" id="experience" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.12 }}>
       <SectionHeading eyebrow="Professional path" title="Experience" icon={BriefcaseBusiness} />
-      <div className="timeline">
+      <motion.div className="timeline" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.08 }}>
         {resumeData.experience.map((item) => (
-          <article className="timeline-item" key={`${item.role}-${item.company}`}>
+          <motion.article className="timeline-item" key={`${item.role}-${item.company}`} variants={fadeUp}>
             <div className="timeline-marker" aria-hidden="true" />
-            <div className="timeline-card">
+            <motion.div className="timeline-card" {...cardMotion}>
               <div className="timeline-header">
                 <div>
                   <h3>{item.role}</h3>
@@ -193,37 +241,37 @@ function ExperienceTimeline() {
                   <li key={bullet}>{bullet}</li>
                 ))}
               </ul>
-            </div>
-          </article>
+            </motion.div>
+          </motion.article>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function Achievements() {
   return (
-    <section className="content-section" id="achievements">
+    <motion.section className="content-section" id="achievements" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.16 }}>
       <SectionHeading eyebrow="Selected outcomes" title="Key Achievements" icon={Award} />
-      <div className="achievement-grid">
+      <motion.div className="achievement-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.18 }}>
         {resumeData.achievements.map((achievement, index) => (
-          <article className="achievement-card" key={achievement}>
+          <motion.article className="achievement-card" key={achievement} variants={fadeUp} {...cardMotion}>
             <span>{String(index + 1).padStart(2, '0')}</span>
             <p>{achievement}</p>
-          </article>
+          </motion.article>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function SelectedWork() {
   return (
-    <section className="content-section" id="selected-work">
+    <motion.section className="content-section" id="selected-work" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
       <SectionHeading eyebrow="Live products" title="Selected Work" icon={Globe2} />
-      <div className="work-grid">
+      <motion.div className="work-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.22 }}>
         {resumeData.projects.map((project, index) => (
-          <a className="work-card" href={project.url} target="_blank" rel="noreferrer" key={project.domain}>
+          <motion.a className="work-card" href={project.url} target="_blank" rel="noreferrer" key={project.domain} variants={fadeUp} {...cardMotion}>
             <span className="work-index">{String(index + 1).padStart(2, '0')}</span>
             <div>
               <h3>{project.name}</h3>
@@ -232,16 +280,16 @@ function SelectedWork() {
             <span className="work-link" aria-hidden="true">
               <ExternalLink size={18} />
             </span>
-          </a>
+          </motion.a>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function Footer() {
   return (
-    <footer className="footer">
+    <motion.footer className="footer" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.4 }}>
       <div>
         <Rocket size={20} />
         <span>{resumeData.name}</span>
@@ -255,7 +303,7 @@ function Footer() {
           GitHub
         </a>
       </nav>
-    </footer>
+    </motion.footer>
   );
 }
 
