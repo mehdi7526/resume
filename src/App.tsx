@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import {
   Award,
   BriefcaseBusiness,
@@ -16,7 +17,7 @@ import {
 import { motion, type Variants } from 'motion/react';
 import profilePhoto from './assets/mehdi-majidi.jpg';
 import personalLogo from './assets/personal-logo.png';
-import { resumeData } from './resumeData';
+import { commonData, type Locale, type ResumeLocaleData, resumeLocales } from './resumeData';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 28, filter: 'blur(8px)' },
@@ -44,13 +45,15 @@ const cardMotion = {
   transition: { type: 'spring', stiffness: 360, damping: 26 },
 };
 
-const contactItems = [
-  { label: 'Phone', value: resumeData.contact.phone, href: `tel:${resumeData.contact.phone}`, icon: Phone },
-  { label: 'Email', value: resumeData.contact.email, href: `mailto:${resumeData.contact.email}`, icon: Mail },
-  { label: 'Location', value: resumeData.contact.location, href: undefined, icon: MapPin },
-  { label: 'LinkedIn', value: 'mahdi-majidi', href: resumeData.contact.linkedin, icon: Linkedin },
-  { label: 'GitHub', value: 'mehdi7526', href: resumeData.contact.github, icon: Github },
-];
+function getContactItems(data: ResumeLocaleData) {
+  return [
+    { label: data.labels.phone, value: commonData.contact.phone, href: `tel:${commonData.contact.phone}`, icon: Phone },
+    { label: data.labels.email, value: commonData.contact.email, href: `mailto:${commonData.contact.email}`, icon: Mail },
+    { label: data.labels.location, value: data.location, href: undefined, icon: MapPin },
+    { label: data.labels.linkedin, value: 'mahdi-majidi', href: commonData.contact.linkedin, icon: Linkedin },
+    { label: data.labels.github, value: 'mehdi7526', href: commonData.contact.github, icon: Github },
+  ];
+}
 
 function SectionHeading({
   eyebrow,
@@ -74,41 +77,52 @@ function SectionHeading({
   );
 }
 
-function Hero() {
+function LanguageToggle({ locale, onToggle, label }: { locale: Locale; onToggle: () => void; label: string }) {
+  return (
+    <button className="language-toggle" type="button" onClick={onToggle} aria-label="Change language">
+      <Languages size={16} />
+      <span>{label}</span>
+      <small>{locale.toUpperCase()}</small>
+    </button>
+  );
+}
+
+function Hero({ data, locale, onToggleLocale }: { data: ResumeLocaleData; locale: Locale; onToggleLocale: () => void }) {
   return (
     <header className="hero">
+      <LanguageToggle locale={locale} onToggle={onToggleLocale} label={data.langLabel} />
       <motion.div className="hero-copy" variants={stagger} initial="hidden" animate="visible">
         <motion.div className="hero-identity" variants={fadeUp}>
           <span className="hero-avatar">
-            <img src={profilePhoto} alt="Mehdi Majidi" />
+            <img src={profilePhoto} alt={data.name} />
           </span>
           <div>
             <div className="status-pill">
               <span />
-              Available for senior frontend opportunities
+              {data.availability}
             </div>
-            <p>Tehran-based senior frontend engineer</p>
+            <p>{data.identityLine}</p>
           </div>
         </motion.div>
-        <motion.h1 variants={fadeUp}>{resumeData.name}</motion.h1>
+        <motion.h1 variants={fadeUp}>{data.name}</motion.h1>
         <motion.p className="hero-title" variants={fadeUp}>
-          {resumeData.title}
+          {data.title}
         </motion.p>
         <motion.p className="hero-summary" variants={fadeUp}>
-          {resumeData.summary}
+          {data.summary}
         </motion.p>
         <motion.div className="hero-actions" aria-label="Primary contact links" variants={fadeUp}>
-          <motion.a className="primary-action" href={`mailto:${resumeData.contact.email}`} {...cardMotion}>
+          <motion.a className="primary-action" href={`mailto:${commonData.contact.email}`} {...cardMotion}>
             <Mail size={18} />
-            Contact Me
+            {data.actions.contact}
           </motion.a>
-          <motion.a className="ghost-action" href={resumeData.contact.linkedin} target="_blank" rel="noreferrer" {...cardMotion}>
+          <motion.a className="ghost-action" href={commonData.contact.linkedin} target="_blank" rel="noreferrer" {...cardMotion}>
             <Linkedin size={18} />
-            LinkedIn
+            {data.actions.linkedin}
           </motion.a>
-          <motion.a className="ghost-action" href={resumeData.contact.github} target="_blank" rel="noreferrer" {...cardMotion}>
+          <motion.a className="ghost-action" href={commonData.contact.github} target="_blank" rel="noreferrer" {...cardMotion}>
             <Github size={18} />
-            GitHub
+            {data.actions.github}
           </motion.a>
         </motion.div>
       </motion.div>
@@ -131,12 +145,12 @@ function Hero() {
           transition={{ type: 'spring', stiffness: 220, damping: 22 }}
         >
           <Code2 size={34} />
-          <strong>React</strong>
-          <span>TypeScript / Micro Frontends / PWA</span>
+          <strong>{data.heroCard.title}</strong>
+          <span>{data.heroCard.subtitle}</span>
           <div className="architecture-stack">
-            <span>Design Systems</span>
-            <span>Core Web Vitals</span>
-            <span>AI-Assisted DX</span>
+            {data.heroCard.tags.map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
           </div>
         </motion.div>
       </motion.div>
@@ -144,7 +158,9 @@ function Hero() {
   );
 }
 
-function ContactPanel() {
+function ContactPanel({ data }: { data: ResumeLocaleData }) {
+  const contactItems = getContactItems(data);
+
   return (
     <motion.section
       className="panel contact-panel"
@@ -154,7 +170,7 @@ function ContactPanel() {
       whileInView="visible"
       viewport={{ once: true, amount: 0.24 }}
     >
-      <SectionHeading title="Contact" icon={Phone} />
+      <SectionHeading title={data.sections.contact} icon={Phone} />
       <div className="contact-list" id="contact-heading">
         {contactItems.map(({ label, value, href, icon: Icon }) => {
           const content = (
@@ -184,12 +200,12 @@ function ContactPanel() {
   );
 }
 
-function SkillsPanel() {
+function SkillsPanel({ data }: { data: ResumeLocaleData }) {
   return (
     <motion.section className="panel" aria-labelledby="skills-heading" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.18 }}>
-      <SectionHeading title="Skills" icon={Sparkles} />
+      <SectionHeading title={data.sections.skills} icon={Sparkles} />
       <div className="skills-stack" id="skills-heading">
-        {resumeData.skills.map((group) => (
+        {data.skills.map((group) => (
           <div className="skill-group" key={group.title}>
             <h3>{group.title}</h3>
             <div className="skill-cloud">
@@ -206,12 +222,12 @@ function SkillsPanel() {
   );
 }
 
-function EducationPanel() {
+function EducationPanel({ data }: { data: ResumeLocaleData }) {
   return (
     <motion.section className="panel compact-panel" aria-labelledby="education-heading" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
-      <SectionHeading title="Education" icon={GraduationCap} />
+      <SectionHeading title={data.sections.education} icon={GraduationCap} />
       <div className="stacked-list" id="education-heading">
-        {resumeData.education.map((item) => (
+        {data.education.map((item) => (
           <article key={`${item.year}-${item.degree}`}>
             <span>{item.year}</span>
             <strong>{item.degree}</strong>
@@ -223,12 +239,12 @@ function EducationPanel() {
   );
 }
 
-function LanguagesPanel() {
+function LanguagesPanel({ data }: { data: ResumeLocaleData }) {
   return (
     <motion.section className="panel compact-panel" aria-labelledby="languages-heading" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.28 }}>
-      <SectionHeading title="Languages" icon={Languages} />
+      <SectionHeading title={data.sections.languages} icon={Languages} />
       <div className="language-list" id="languages-heading">
-        {resumeData.languages.map((language) => (
+        {data.languages.map((language) => (
           <motion.span key={language} whileHover={{ y: -2, scale: 1.04 }} transition={{ type: 'spring', stiffness: 420, damping: 24 }}>
             {language}
           </motion.span>
@@ -238,12 +254,12 @@ function LanguagesPanel() {
   );
 }
 
-function ExperienceTimeline() {
+function ExperienceTimeline({ data }: { data: ResumeLocaleData }) {
   return (
     <motion.section className="content-section" id="experience" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.12 }}>
-      <SectionHeading eyebrow="Professional path" title="Experience" icon={BriefcaseBusiness} />
+      <SectionHeading eyebrow={data.sections.experienceEyebrow} title={data.sections.experience} icon={BriefcaseBusiness} />
       <motion.div className="timeline" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.08 }}>
-        {resumeData.experience.map((item) => (
+        {data.experience.map((item) => (
           <motion.article className="timeline-item" key={`${item.role}-${item.company}`} variants={fadeUp}>
             <div className="timeline-marker" aria-hidden="true" />
             <motion.div className="timeline-card" {...cardMotion}>
@@ -267,12 +283,12 @@ function ExperienceTimeline() {
   );
 }
 
-function Achievements() {
+function Achievements({ data }: { data: ResumeLocaleData }) {
   return (
     <motion.section className="content-section" id="achievements" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.16 }}>
-      <SectionHeading eyebrow="Selected outcomes" title="Key Achievements" icon={Award} />
+      <SectionHeading eyebrow={data.sections.achievementsEyebrow} title={data.sections.achievements} icon={Award} />
       <motion.div className="achievement-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.18 }}>
-        {resumeData.achievements.map((achievement, index) => (
+        {data.achievements.map((achievement, index) => (
           <motion.article className="achievement-card" key={achievement} variants={fadeUp} {...cardMotion}>
             <span>{String(index + 1).padStart(2, '0')}</span>
             <p>{achievement}</p>
@@ -283,12 +299,12 @@ function Achievements() {
   );
 }
 
-function SelectedWork() {
+function SelectedWork({ data }: { data: ResumeLocaleData }) {
   return (
     <motion.section className="content-section" id="selected-work" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-      <SectionHeading eyebrow="Live products" title="Selected Work" icon={Globe2} />
+      <SectionHeading eyebrow={data.sections.selectedWorkEyebrow} title={data.sections.selectedWork} icon={Globe2} />
       <motion.div className="work-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.22 }}>
-        {resumeData.projects.map((project, index) => (
+        {commonData.projects.map((project, index) => (
           <motion.a className="work-card" href={project.url} target="_blank" rel="noreferrer" key={project.domain} variants={fadeUp} {...cardMotion}>
             <span className="work-index">{String(index + 1).padStart(2, '0')}</span>
             <div>
@@ -305,20 +321,20 @@ function SelectedWork() {
   );
 }
 
-function Footer() {
+function Footer({ data }: { data: ResumeLocaleData }) {
   return (
     <motion.footer className="footer" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.4 }}>
       <div>
         <img className="footer-logo" src={personalLogo} alt="" />
-        <span>{resumeData.name}</span>
+        <span>{data.name}</span>
       </div>
       <nav aria-label="Footer links">
-        <a href={`mailto:${resumeData.contact.email}`}>Email</a>
-        <a href={resumeData.contact.linkedin} target="_blank" rel="noreferrer">
-          LinkedIn
+        <a href={`mailto:${commonData.contact.email}`}>{data.labels.email}</a>
+        <a href={commonData.contact.linkedin} target="_blank" rel="noreferrer">
+          {data.actions.linkedin}
         </a>
-        <a href={resumeData.contact.github} target="_blank" rel="noreferrer">
-          GitHub
+        <a href={commonData.contact.github} target="_blank" rel="noreferrer">
+          {data.actions.github}
         </a>
       </nav>
     </motion.footer>
@@ -326,24 +342,29 @@ function Footer() {
 }
 
 export function App() {
+  const [locale, setLocale] = useState<Locale>('en');
+  const data = resumeLocales[locale];
+  const appClassName = useMemo(() => `app-shell ${locale === 'fa' ? 'is-fa' : 'is-en'}`, [locale]);
+  const toggleLocale = () => setLocale((current) => (current === 'en' ? 'fa' : 'en'));
+
   return (
-    <main className="app-shell">
+    <main className={appClassName} dir={data.dir} lang={locale}>
       <div className="ambient-grid" aria-hidden="true" />
-      <Hero />
+      <Hero data={data} locale={locale} onToggleLocale={toggleLocale} />
       <div className="resume-layout">
         <aside className="sidebar" aria-label="Resume details">
-          <ContactPanel />
-          <SkillsPanel />
-          <EducationPanel />
-          <LanguagesPanel />
+          <ContactPanel data={data} />
+          <SkillsPanel data={data} />
+          <EducationPanel data={data} />
+          <LanguagesPanel data={data} />
         </aside>
         <div className="main-content">
-          <ExperienceTimeline />
-          <SelectedWork />
-          <Achievements />
+          <ExperienceTimeline data={data} />
+          <SelectedWork data={data} />
+          <Achievements data={data} />
         </div>
       </div>
-      <Footer />
+      <Footer data={data} />
     </main>
   );
 }
