@@ -148,13 +148,14 @@ a {
 .language-toggle {
   position: absolute;
   top: 28px;
-  inset-inline-end: 0;
+  right: 0;
+  left: auto;
   z-index: 4;
   min-height: 42px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 12px;
+  gap: 4px;
+  padding: 7px;
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--silver);
@@ -165,10 +166,16 @@ a {
   font: inherit;
   font-size: 0.86rem;
   font-weight: 800;
+  direction: ltr;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
     background 180ms ease;
+}
+
+.is-fa .language-toggle {
+  right: auto;
+  left: 0;
 }
 
 .language-toggle:hover {
@@ -178,13 +185,24 @@ a {
 }
 
 .language-toggle svg {
+  margin-inline-end: 4px;
   color: var(--cyan);
 }
 
-.language-toggle small {
+.language-toggle span {
+  min-width: 34px;
+  padding: 6px 8px;
+  border-radius: 7px;
   color: var(--soft);
-  font-size: 0.68rem;
-  font-weight: 900;
+  text-align: center;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.language-toggle span.active {
+  color: #061122;
+  background: linear-gradient(135deg, var(--cyan), var(--blue));
 }
 
 .hero-identity {
@@ -596,10 +614,6 @@ a {
   margin-bottom: 20px;
 }
 
-.is-fa .section-heading {
-  flex-direction: row-reverse;
-}
-
 .section-icon {
   width: 36px;
   height: 36px;
@@ -650,10 +664,15 @@ a {
 }
 
 .is-fa .contact-item {
-  grid-template-columns: minmax(0, 1fr) 36px;
+  grid-template-columns: 36px minmax(0, 1fr);
 }
 
 .is-fa .contact-icon {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.is-fa .contact-item > span:not(.contact-icon) {
   grid-column: 2;
   grid-row: 1;
 }
@@ -784,10 +803,15 @@ a {
 }
 
 .is-fa .timeline-item {
-  grid-template-columns: minmax(0, 1fr) 22px;
+  grid-template-columns: 22px minmax(0, 1fr);
 }
 
 .is-fa .timeline-marker {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.is-fa .timeline-card {
   grid-column: 2;
   grid-row: 1;
 }
@@ -832,6 +856,10 @@ a {
   transform: translateX(4px);
   border-color: rgba(54, 210, 255, 0.28);
   background: linear-gradient(145deg, rgba(23, 40, 72, 0.86), rgba(11, 18, 34, 0.78));
+}
+
+.is-fa .timeline-card:hover {
+  transform: translateX(-4px);
 }
 
 .timeline-header {
@@ -1038,11 +1066,6 @@ a {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel-strong);
-}
-
-.is-fa .footer nav,
-.is-fa .footer div {
-  flex-direction: row-reverse;
 }
 
 .footer div,

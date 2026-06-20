@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Award,
   BriefcaseBusiness,
@@ -45,6 +45,20 @@ const cardMotion = {
   transition: { type: 'spring', stiffness: 360, damping: 26 },
 };
 
+function getLocaleFromUrl(): Locale {
+  if (typeof window === 'undefined') {
+    return 'en';
+  }
+
+  return new URLSearchParams(window.location.search).get('lang') === 'fa' ? 'fa' : 'en';
+}
+
+function setLocaleInUrl(locale: Locale) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('lang', locale);
+  window.history.replaceState(null, '', url);
+}
+
 function getContactItems(data: ResumeLocaleData) {
   return [
     { label: data.labels.phone, value: commonData.contact.phone, href: `tel:${commonData.contact.phone}`, icon: Phone },
@@ -77,12 +91,12 @@ function SectionHeading({
   );
 }
 
-function LanguageToggle({ locale, onToggle, label }: { locale: Locale; onToggle: () => void; label: string }) {
+function LanguageToggle({ locale, onToggle }: { locale: Locale; onToggle: () => void }) {
   return (
     <button className="language-toggle" type="button" onClick={onToggle} aria-label="Change language">
       <Languages size={16} />
-      <span>{label}</span>
-      <small>{locale.toUpperCase()}</small>
+      <span className={locale === 'fa' ? 'active' : undefined}>FA</span>
+      <span className={locale === 'en' ? 'active' : undefined}>EN</span>
     </button>
   );
 }
@@ -90,7 +104,7 @@ function LanguageToggle({ locale, onToggle, label }: { locale: Locale; onToggle:
 function Hero({ data, locale, onToggleLocale }: { data: ResumeLocaleData; locale: Locale; onToggleLocale: () => void }) {
   return (
     <header className="hero">
-      <LanguageToggle locale={locale} onToggle={onToggleLocale} label={data.langLabel} />
+      <LanguageToggle locale={locale} onToggle={onToggleLocale} />
       <motion.div className="hero-copy" variants={stagger} initial="hidden" animate="visible">
         <motion.div className="hero-identity" variants={fadeUp}>
           <span className="hero-avatar">
@@ -342,10 +356,22 @@ function Footer({ data }: { data: ResumeLocaleData }) {
 }
 
 export function App() {
-  const [locale, setLocale] = useState<Locale>('en');
+  const [locale, setLocale] = useState<Locale>(() => getLocaleFromUrl());
   const data = resumeLocales[locale];
   const appClassName = useMemo(() => `app-shell ${locale === 'fa' ? 'is-fa' : 'is-en'}`, [locale]);
-  const toggleLocale = () => setLocale((current) => (current === 'en' ? 'fa' : 'en'));
+  const toggleLocale = () => {
+    setLocale((current) => {
+      const nextLocale = current === 'en' ? 'fa' : 'en';
+      setLocaleInUrl(nextLocale);
+      return nextLocale;
+    });
+  };
+
+  useEffect(() => {
+    const syncLocaleFromUrl = () => setLocale(getLocaleFromUrl());
+    window.addEventListener('popstate', syncLocaleFromUrl);
+    return () => window.removeEventListener('popstate', syncLocaleFromUrl);
+  }, []);
 
   return (
     <main className={appClassName} dir={data.dir} lang={locale}>
