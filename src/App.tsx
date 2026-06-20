@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion, type Variants } from 'motion/react';
+import profilePhoto from './assets/mehdi-majidi.jpg';
 import { resumeData } from './resumeData';
 
 const fadeUp: Variants = {
@@ -77,9 +78,17 @@ function Hero() {
   return (
     <header className="hero">
       <motion.div className="hero-copy" variants={stagger} initial="hidden" animate="visible">
-        <motion.div className="status-pill" variants={fadeUp}>
-          <span />
-          Available for senior frontend opportunities
+        <motion.div className="hero-identity" variants={fadeUp}>
+          <span className="hero-avatar">
+            <img src={profilePhoto} alt="Mehdi Majidi" />
+          </span>
+          <div>
+            <div className="status-pill">
+              <span />
+              Available for senior frontend opportunities
+            </div>
+            <p>Tehran-based senior frontend engineer</p>
+          </div>
         </motion.div>
         <motion.h1 variants={fadeUp}>{resumeData.name}</motion.h1>
         <motion.p className="hero-title" variants={fadeUp}>
@@ -116,11 +125,20 @@ function Hero() {
         <div className="orbital-ring ring-one" />
         <div className="orbital-ring ring-two" />
         <div className="orbital-ring ring-three" />
-        <div className="core-card">
+        <motion.div
+          className="core-card"
+          whileHover={{ y: -8, rotateX: 2, rotateY: -3 }}
+          transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+        >
           <Code2 size={34} />
           <strong>React</strong>
           <span>TypeScript / Micro Frontends / PWA</span>
-        </div>
+          <div className="architecture-stack">
+            <span>Design Systems</span>
+            <span>Core Web Vitals</span>
+            <span>AI-Assisted DX</span>
+          </div>
+        </motion.div>
       </motion.div>
     </header>
   );
