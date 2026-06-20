@@ -194,7 +194,7 @@ function ContactPanel({ data }: { data: ResumeLocaleData }) {
               </span>
               <span>
                 <small>{label}</small>
-                <strong>{value}</strong>
+                <strong dir={href?.startsWith('tel:') ? 'ltr' : undefined}>{value}</strong>
               </span>
             </>
           );

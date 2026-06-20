@@ -2,7 +2,7 @@ export type Locale = "en" | "fa";
 
 export const commonData = {
   contact: {
-    phone: "9374477013",
+    phone: "+98 9374477013",
     email: "mahdimajidi7526@gmail.com",
     linkedin: "https://www.linkedin.com/in/mahdi-majidi-1b34b018b/",
     github: "https://github.com/mehdi7526",

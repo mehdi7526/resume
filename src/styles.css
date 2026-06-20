@@ -145,6 +145,10 @@ a {
   padding: 44px 0 76px;
 }
 
+.hero-copy {
+  min-width: 0;
+}
+
 .language-toggle {
   position: absolute;
   top: 28px;
@@ -276,9 +280,10 @@ a {
 .hero h1 {
   margin: 24px 0 0;
   color: var(--text);
-  font-size: clamp(3.8rem, 8vw, 7.8rem);
+  font-size: 5.7rem;
   line-height: 0.88;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .hero-title {
@@ -1250,17 +1255,23 @@ a {
   }
 }
 
+@media (min-width: 921px) and (max-width: 1100px) {
+  .hero h1 {
+    font-size: 4.45rem;
+  }
+}
+
 @media (max-width: 640px) {
   .app-shell {
     width: min(100% - 18px, 520px);
   }
 
   .hero h1 {
-    font-size: clamp(3.2rem, 18vw, 5rem);
+    font-size: 2.95rem;
   }
 
   .is-fa .hero h1 {
-    font-size: clamp(2.65rem, 14vw, 4.2rem);
+    font-size: 2.72rem;
     line-height: 1.08;
   }
 
