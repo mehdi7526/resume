@@ -11,11 +11,11 @@ import {
   Mail,
   MapPin,
   Phone,
-  Rocket,
   Sparkles,
 } from 'lucide-react';
 import { motion, type Variants } from 'motion/react';
 import profilePhoto from './assets/mehdi-majidi.jpg';
+import personalLogo from './assets/personal-logo.png';
 import { resumeData } from './resumeData';
 
 const fadeUp: Variants = {
@@ -309,7 +309,7 @@ function Footer() {
   return (
     <motion.footer className="footer" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.4 }}>
       <div>
-        <Rocket size={20} />
+        <img className="footer-logo" src={personalLogo} alt="" />
         <span>{resumeData.name}</span>
       </div>
       <nav aria-label="Footer links">

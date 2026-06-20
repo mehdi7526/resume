@@ -927,6 +927,13 @@ a {
   color: var(--cyan);
 }
 
+.footer-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(54, 210, 255, 0.22));
+}
+
 .footer a {
   color: var(--muted);
   font-weight: 700;
